@@ -14,6 +14,17 @@ interface iFileSystem {
 
 class RealFileSystem implements iFileSystem{
 	public  $debug = false;
+	public $extensions = array(
+		"docx" 	=> "doc",
+		"xsl" 	=> "excel",
+		"xslx" 	=> "excel",
+		"txt"	=> "text", "md"=>"text",
+		"html"	=> "code", "js"=>"code", "css"=>"code", "php"=>"code", "htm"=>"code",
+		"mpg"	=> "video", "mp4"=>"video","avi"=>"video","mkv"=>"video",
+		"png"	=> "image", "jpg"=>"image", "gif"=>"image",
+		"mp3"	=> "audio", "ogg"=>"audio",
+		"zip"	=> "archive", "rar"=>"archive", "7z"=>"archive", "tar"=>"archive", "gz"=>"archive"
+	);
 
 	private $top;
 	private $url;
@@ -28,6 +39,13 @@ class RealFileSystem implements iFileSystem{
 
 		if (substr($this->top, -1) != $this->sep)
 			$this->top .= $this->sep;
+	}
+
+	private function get_type($entry){
+		$ext = pathinfo($entry, PATHINFO_EXTENSION);
+		if ($ext && isset($this->extensions[$ext]))
+			return $this->extensions[$ext];
+		return $ext;
 	}
 
 	private function check_path($path, $folder = false, $file = false){
@@ -115,7 +133,7 @@ class RealFileSystem implements iFileSystem{
 			$temp = array(
 				"id" => $folder.$entry,
 				"value" => $entry,
-				"type" => $isdir ? "dir" : "file",
+				"type" => $isdir ? "folder" : $this->get_type($entry),
 				"size" => $isdir ? 0 : filesize($file),
 				"date" => filemtime($file)
 			);
