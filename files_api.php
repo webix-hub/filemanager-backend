@@ -32,7 +32,7 @@ class RealFileSystem implements iFileSystem{
 	private $sep;	
 
 	function __construct($topdir = "/", $topurl = "/"){
-		$this->top = $topdir;
+		$this->top = realpath($topdir);
 		$this->url = $topurl;
 		$this->win = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 		$this->sep = $this->win ? "\\" : "/";
@@ -146,7 +146,17 @@ class RealFileSystem implements iFileSystem{
 		}
 		$d->close();
 
+		usort($data, array($this, "sort"));
+
 		return $data;
+	}
+	public function sort($a, $b){
+		$af = $a["type"] == "folder";
+		$bf = $b["type"] == "folder";
+		if ($af && !$bf) return -1;
+		if ($bf && !$af) return 1;
+
+		return $a["value"] > $b["value"] ? 1 : ($a["value"] < $b["value"] ? -1 : 0);
 	}
 
 	public function rm($file){
