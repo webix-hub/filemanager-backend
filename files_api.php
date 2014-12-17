@@ -8,8 +8,36 @@ interface iFileSystem {
 	public function touch($path);
 	public function cat($path);
 
-	public function upload($path, $temp);
+	public function upload($path, $name, $temp);
 	public function url($path);
+
+	public function batch($source, $operation, $target);
+}
+interface iFileInfo{
+	public function getSize();
+	public function getName();
+	public function getContent();
+}
+
+
+class RealFileInfo implements iFileInfo{
+	private $content;
+	private $name;
+
+	function __construct($path){
+		$this->content = file_get_contents($path);
+		$this->name = pathinfo($path, PATHINFO_BASENAME);
+	}
+
+	public function getName(){
+		return $this->name;
+	}
+	public function getSize(){
+		return strlen($this->content);
+	}
+	public function getContent(){
+		return $this->content;
+	}
 }
 
 class RealFileSystem implements iFileSystem{
@@ -48,17 +76,22 @@ class RealFileSystem implements iFileSystem{
 		return $ext;
 	}
 
-	private function check_path($path, $folder = false, $file = false){
-		$path = str_replace("..","",preg_replace("|[^a-z0-9-_\\.\\/\\:]|i", "", str_replace("\\","/",$this->top.$path)));
+	private function file_id($full){
+ 		return str_replace($this->top, "", $full);
+	}
+
+	private function safe_name($name){
+		$name = str_replace("..","",preg_replace("|[^a-z0-9-_\\.\\/\\:]|i", "", str_replace("\\","/",$name)));
 		if ($this->win)
-			$path = str_replace("/", "\\", $path);
+			$name = str_replace("/", "\\", $name);
 		else
-			$path = str_replace("\\", "/", $path);
+			$name = str_replace("\\", "/", $name);
 
-		$path = preg_replace('#[\\\\\\/]+#', $this->sep, $path);
-
-
-
+		return preg_replace('#[\\\\\\/]+#', $this->sep, $name);
+	}
+	private function check_path($path, $folder = false, $file = false){
+		$path = $this->safe_name($this->top.$path);
+		
 		if (!$path || strpos($path, $this->top) !== 0)
 			throw new Exception("Path is outside of sandbox: ".$path);
 
@@ -159,6 +192,18 @@ class RealFileSystem implements iFileSystem{
 		return $a["value"] > $b["value"] ? 1 : ($a["value"] < $b["value"] ? -1 : 0);
 	}
 
+	public function batch($source, $operation, $target = null){
+		$list = explode(",", $source);
+		$result = array();
+		for ($i=0; $i < sizeof($list); $i++)
+			if ($target !== null)
+				$result[] = call_user_func($operation, $list[$i], $target);
+			else
+				$result[] = call_user_func($operation, $list[$i]);
+		
+		return $result;
+	}
+
 	public function rm($file){
 		$file = $this->check_path($file, true, true);
 
@@ -200,11 +245,23 @@ class RealFileSystem implements iFileSystem{
 		return file_get_contents($path);
 	}
 
-	public function upload($path, $temp){
-		$path = $this->check_path($path, false, true);
-		throw new Exception("Not implemented");
+	public function upload($path, $name, $temp){
+				$this->check_path($path, true, false);
+		$full = $this->check_path($path.$this->sep.$name);
+		
+		move_uploaded_file($temp, $full);
+		return array(
+			"folder" => $this->safe_name($path),
+			"file"   => $this->safe_name($name),
+			"id"     => $this->file_id($full),
+			"type"   => $this->get_type($name),
+			"status" => "server"
+		);
+	}
 
-		return "ok";
+	public function download($file){
+		$file = $this->check_path($file, false, true);
+		return new RealFileInfo($file);
 	}
 
 	public function url($path){
