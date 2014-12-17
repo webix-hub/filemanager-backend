@@ -42,6 +42,7 @@ class RealFileInfo implements iFileInfo{
 
 class RealFileSystem implements iFileSystem{
 	public  $debug = false;
+	public $batchSeparator = ",";
 	public $extensions = array(
 		"docx" 	=> "doc",
 		"xsl" 	=> "excel",
@@ -57,7 +58,7 @@ class RealFileSystem implements iFileSystem{
 	private $top;
 	private $url;
 	private $win;
-	private $sep;	
+	private $sep;
 
 	function __construct($topdir = "/", $topurl = "/"){
 		$this->top = realpath($topdir);
@@ -126,7 +127,7 @@ class RealFileSystem implements iFileSystem{
 	}
 
 	private function unlink($path){
-		if ($win){
+		if ($this->win){
 			if (is_file($path))
 				$this->exec("del /s $path");
 			else
@@ -136,15 +137,21 @@ class RealFileSystem implements iFileSystem{
 			$this->exec("rm -rf $path");
 	}
 	private function move($source, $target){
-		if ($win){
-			$this->exec("robocopy $source $target /e /move");
+		if ($this->win){
+			if (is_file($source))
+				$this->exec("move $source $target");
+			else
+				$this->exec("robocopy $source $target /e /move");
 		}
 		else
 			$this->exec("mv -rf $source $target");
 	}
 	private function copy($source, $target){
-		if ($win){
-			$this->exec("robocopy $source $target /e");
+		if ($this->win){
+			if (is_file($source))
+				$this->exec("copy $source $target");
+			else
+				$this->exec("robocopy $source $target /e");
 		}
 		else
 			$this->exec("cp -rf $source $target");
@@ -193,13 +200,15 @@ class RealFileSystem implements iFileSystem{
 	}
 
 	public function batch($source, $operation, $target = null){
-		$list = explode(",", $source);
+		if (!is_array($source))
+			$source = explode($this->batchSeparator, $source);
+
 		$result = array();
-		for ($i=0; $i < sizeof($list); $i++)
+		for ($i=0; $i < sizeof($source); $i++)
 			if ($target !== null)
-				$result[] = call_user_func($operation, $list[$i], $target);
+				$result[] = call_user_func($operation, $source[$i], $target);
 			else
-				$result[] = call_user_func($operation, $list[$i]);
+				$result[] = call_user_func($operation, $source[$i]);
 		
 		return $result;
 	}

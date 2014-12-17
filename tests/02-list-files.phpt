@@ -28,9 +28,9 @@ listlog($data, "");
 ?>
 --EXPECTF--
 List C:\http\php-files-api\tests\sandbox\sub1\sub2\
-LICENSE, , 1048, sub1/sub2/LICENSE
-README.md, text, 27709, sub1/sub2/README.md
-zalgo.js, code, 52, sub1/sub2/zalgo.js
+LICENSE, , 1067, sub1/sub2/LICENSE
+README.md, text, 28368, sub1/sub2/README.md
+zalgo.js, code, 53, sub1/sub2/zalgo.js
 List C:\http\php-files-api\tests\sandbox\sub1\
 sub2, folder, 0, sub1/sub2
 Makefile, , 562, sub1/Makefile
