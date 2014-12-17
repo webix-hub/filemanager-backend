@@ -1,5 +1,6 @@
 <?php
 interface iFileSystem {
+	public function virtualRoot($name);
 	public function ls($dir, $nested);
 	public function rm($file);
 	public function cp($source, $target);
@@ -59,6 +60,7 @@ class RealFileSystem implements iFileSystem{
 	private $url;
 	private $win;
 	private $sep;
+	private $vroot = false;
 
 	function __construct($topdir = "/", $topurl = "/"){
 		$this->top = realpath($topdir);
@@ -70,11 +72,20 @@ class RealFileSystem implements iFileSystem{
 			$this->top .= $this->sep;
 	}
 
+	function virtualRoot($name){
+		$this->vroot = $name;
+	}
+
 	private function get_type($entry){
 		$ext = pathinfo($entry, PATHINFO_EXTENSION);
 		if ($ext && isset($this->extensions[$ext]))
 			return $this->extensions[$ext];
 		return $ext;
+	}
+
+	private function top_dir($source){
+		$data = explode($this->sep, $source);
+		return $data[sizeof($data)-1];
 	}
 
 	private function file_id($full){
@@ -141,7 +152,7 @@ class RealFileSystem implements iFileSystem{
 			if (is_file($source))
 				$this->exec("move $source $target");
 			else
-				$this->exec("robocopy $source $target /e /move");
+				$this->exec("robocopy $source ".$this->safe_name($target.$this->sep.$this->top_dir($source))." /e /move");
 		}
 		else
 			$this->exec("mv -rf $source $target");
@@ -151,13 +162,13 @@ class RealFileSystem implements iFileSystem{
 			if (is_file($source))
 				$this->exec("copy $source $target");
 			else
-				$this->exec("robocopy $source $target /e");
+				$this->exec("robocopy $source ".$this->safe_name($target.$this->sep.$this->top_dir($source))." /e");
 		}
 		else
 			$this->exec("cp -rf $source $target");
 	}
 
-	public function ls($dir, $nested = false){
+	private function dir($dir, $nested){
 		$dir = $this->check_path($dir, true);
 		$this->log("List $dir");
 
@@ -179,7 +190,7 @@ class RealFileSystem implements iFileSystem{
 			);
 
 			if ($isdir && $nested){
-				$temp["data"] = $this->ls($temp["id"], $nested);
+				$temp["data"] = $this->dir($temp["id"], $nested);
 			}
 
 			$data[] = $temp;
@@ -190,6 +201,25 @@ class RealFileSystem implements iFileSystem{
 
 		return $data;
 	}
+
+	public function ls($dir, $nested = false){
+		$data = $this->dir($dir, $nested);
+		if ($this->vroot)
+			return array(
+				array( 
+					"value" => $this->vroot,
+					"type" => "folder",
+					"size" => 0,
+					"date" => 0,
+					"id" => "/",
+					"data" => &$data,
+					"open" => true
+				)
+			);
+		
+		return $data;
+	}
+
 	public function sort($a, $b){
 		$af = $a["type"] == "folder";
 		$bf = $b["type"] == "folder";
@@ -216,7 +246,10 @@ class RealFileSystem implements iFileSystem{
 	public function rm($file){
 		$file = $this->check_path($file, true, true);
 
-		$this->unlink($file);
+		//do not allow root deletion
+		if ($this->file_id($file) !== "")
+			$this->unlink($file);
+
 		return "ok";
 	}
 

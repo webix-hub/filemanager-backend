@@ -14,4 +14,4 @@ $api->mv("sub1\\sub2", "");
 ?>
 --EXPECTF--
 move C:\http\php-files-api\tests\sandbox\D230604.txt C:\http\php-files-api\tests\sandbox\sub1\sub2
-robocopy C:\http\php-files-api\tests\sandbox\sub1\sub2 C:\http\php-files-api\tests\sandbox\ /e /move
+robocopy C:\http\php-files-api\tests\sandbox\sub1\sub2 C:\http\php-files-api\tests\sandbox\sub2 /e /move

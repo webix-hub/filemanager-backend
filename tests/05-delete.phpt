@@ -11,6 +11,8 @@ $api->debug = true;
 $api->rm("D230604.txt");
 $api->rm("sub1\\sub2");
 $api->rm("sub1\\sub2\\zalgo.js");
+$api->rm("");
+$api->rm("/");
 
 ?>
 --EXPECTF--
