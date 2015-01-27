@@ -3,10 +3,10 @@ Basic operations
 --FILE--
 <?php
 
-include_once dirname(__FILE__) . "/../files_api.php";
+include_once dirname(__FILE__) . "/../CommandFileSystem.php";
 $sandbox = realpath(__DIR__."/sandbox");
 
-$api = new RealFileSystem($sandbox);
+$api = new CommandFileSystem($sandbox);
 $api->debug = true;
 $api->rm("D230604.txt");
 $api->rm("sub1\\sub2");

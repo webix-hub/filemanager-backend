@@ -1,47 +1,7 @@
 <?php
-interface iFileSystem {
-	public function virtualRoot($name);
-	public function ls($dir, $nested);
-	public function rm($file);
-	public function cp($source, $target);
-	public function mv($source, $target);
+require_once("FileSystem.php");
 
-	public function touch($path);
-	public function cat($path);
-
-	public function upload($path, $name, $temp);
-	public function url($path);
-
-	public function batch($source, $operation, $target);
-}
-interface iFileInfo{
-	public function getSize();
-	public function getName();
-	public function getContent();
-}
-
-
-class RealFileInfo implements iFileInfo{
-	private $content;
-	private $name;
-
-	function __construct($path){
-		$this->content = file_get_contents($path);
-		$this->name = pathinfo($path, PATHINFO_BASENAME);
-	}
-
-	public function getName(){
-		return $this->name;
-	}
-	public function getSize(){
-		return strlen($this->content);
-	}
-	public function getContent(){
-		return $this->content;
-	}
-}
-
-class RealFileSystem implements iFileSystem{
+class CommandFileSystem implements iFileSystem{
 	public  $debug = false;
 	public $batchSeparator = ",";
 	public $extensions = array(
@@ -49,7 +9,7 @@ class RealFileSystem implements iFileSystem{
 		"xsl" 	=> "excel",
 		"xslx" 	=> "excel",
 		"txt"	=> "text", "md"=>"text",
-		"html"	=> "code", "js"=>"code", "css"=>"code", "php"=>"code", "htm"=>"code",
+		"html"	=> "code", "js"=>"code", "json"=>"code", "css"=>"code", "php"=>"code", "htm"=>"code",
 		"mpg"	=> "video", "mp4"=>"video","avi"=>"video","mkv"=>"video",
 		"png"	=> "image", "jpg"=>"image", "gif"=>"image",
 		"mp3"	=> "audio", "ogg"=>"audio",
@@ -59,7 +19,7 @@ class RealFileSystem implements iFileSystem{
 	private $top;
 	private $url;
 	private $win;
-	private $sep;
+	protected $sep;
 	private $vroot = false;
 
 	function __construct($topdir = "/", $topurl = "/"){
@@ -137,7 +97,7 @@ class RealFileSystem implements iFileSystem{
 			echo $message."\n";
 	}
 
-	private function unlink($path){
+    protected function unlink($path){
 		if ($this->win){
 			if (is_file($path))
 				$this->exec("del /s $path");
@@ -146,8 +106,18 @@ class RealFileSystem implements iFileSystem{
 		}
 		else
 			$this->exec("rm -rf $path");
+
 	}
-	private function move($source, $target){
+    protected function makedir($target){
+		$this->exec("mkdir $target");
+	}
+	protected function ren($source, $target, $name){
+		if ($this->win)
+			$this->exec("rename $source $name");
+		else
+			$this->exec("mv -rf $source $target");
+	}
+    protected function move($source, $target){
 		if ($this->win){
 			if (is_file($source))
 				$this->exec("move $source $target");
@@ -157,7 +127,7 @@ class RealFileSystem implements iFileSystem{
 		else
 			$this->exec("mv -rf $source $target");
 	}
-	private function copy($source, $target){
+    protected function copy($source, $target){
 		if ($this->win){
 			if (is_file($source))
 				$this->exec("copy $source $target");
@@ -276,9 +246,22 @@ class RealFileSystem implements iFileSystem{
 		return "ok";
 	}
 
-	public function mkdir($path){
-		$path = $this->check_path($path);
-		throw new Exception("Not implemented");
+	public function mkdir($name, $path){
+		$path = $this->check_path($path.$this->sep.$name);
+		$this->makedir($path);
+		$id = str_replace("\\","/",str_replace($this->top, "", $path));
+		return array( "id" => $id );
+	}
+
+	public function rename($source, $target){
+		$name = $this->safe_name($target);
+		$target = $this->check_path(dirname($source).$this->sep.$target);
+		$source = $this->check_path($source, true, true);
+
+
+		$this->ren($source, $target, $name);
+		$id = str_replace("\\","/",str_replace($this->top, "", $target));
+		return array( "id" => $id );
 	}
 
 	public function cat($path){
@@ -312,3 +295,4 @@ class RealFileSystem implements iFileSystem{
 		return $this->url.$path;
 	}
 }
+?>
