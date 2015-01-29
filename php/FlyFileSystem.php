@@ -24,7 +24,8 @@ use League\Flysystem\ZipArchive\ZipArchiveAdapter;
 class FlyFileSystem extends CommandFileSystem{
     protected $aFilesystem;
 
-    function __construct(Filesystem $aFilesystem) {
+    function __construct(Filesystem $aFilesystem, $topdir = "/", $topurl = "/") {
+        parent::__construct($topdir, $topurl);
         $this->aFilesystem = $aFilesystem;
     }
 }
