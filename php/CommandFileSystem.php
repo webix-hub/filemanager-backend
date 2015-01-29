@@ -48,7 +48,7 @@ class CommandFileSystem implements iFileSystem{
 		return $data[sizeof($data)-1];
 	}
 
-	private function file_id($full){
+	protected function file_id($full){
  		return str_replace($this->top, "", $full);
 	}
 
