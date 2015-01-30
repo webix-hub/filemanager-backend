@@ -28,6 +28,34 @@ class FlyFileSystem extends CommandFileSystem{
         parent::__construct($topdir, $topurl);
         $this->aFilesystem = $aFilesystem;
     }
+
+    protected function dir($dir, $nested){
+        $data = array();
+
+        $files = $this->aFilesystem->listContents($dir, false);
+        foreach ($files as $file){
+            if ($file["basename"] != "." && $file["basename"] != "..") {
+                $isdir = $file['type'] == 'dir';
+                $temp = array(
+                    "id" => $this->file_id($file["path"]),
+                    "value" => $file["basename"],
+                    "type" => $isdir ? 'folder' : $this->get_type($file["basename"]),
+                    "size" => $isdir ? 0 : $file['size'],
+                    "date" => array_key_exists('timestamp', $file) ? $file['timestamp'] : ''
+                );
+
+                if ($isdir && $nested){
+                    $temp["data"] = $this->dir($file["path"], $nested);
+                }
+
+                $data[] = $temp;
+            }
+        }
+
+        usort($data, array($this, "sort"));
+
+        return $data;
+    }
 }
 
 
@@ -48,7 +76,7 @@ class ZipFlyFileSystem extends FlyFileSystem{
         return $this->aFilesystem->createDir($target);
     }
 
-    protected function ren($source, $target){
+    protected function ren($source, $target, $name){
         $source = $this->file_id($source);
         $target = $this->file_id($target);
 
@@ -63,7 +91,7 @@ class ZipFlyFileSystem extends FlyFileSystem{
             $files = $this->aFilesystem->listContents($source, false);
             foreach ($files as $file){
                 if ($file["basename"] != "." && $file["basename"] != "..") {
-                    $this->ren($file["path"], $target.$this->sep.$file["basename"]);
+                    $this->ren($file["path"], $target.$this->sep.$file["basename"], $file["basename"]);
                 }
             }
 
@@ -136,7 +164,7 @@ class LocalFlyFileSystem extends FlyFileSystem{
         $this->aFilesystem->createDir($target);
     }
 
-    protected function ren($source, $target){
+    protected function ren($source, $target, $name){
         $source = $this->file_id($source);
         $target = $this->file_id($target);
 

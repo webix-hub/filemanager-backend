@@ -16,11 +16,11 @@ class CommandFileSystem implements iFileSystem{
 		"zip"	=> "archive", "rar"=>"archive", "7z"=>"archive", "tar"=>"archive", "gz"=>"archive"
 	);
 
-	private $top;
-	private $url;
-	private $win;
+    protected $top;
+    protected $url;
+    protected $win;
 	protected $sep;
-	private $vroot = false;
+    protected $vroot = false;
 
 	function __construct($topdir = "/", $topurl = "/"){
 		$this->top = realpath($topdir);
@@ -36,7 +36,7 @@ class CommandFileSystem implements iFileSystem{
 		$this->vroot = $name;
 	}
 
-	private function get_type($entry){
+    protected function get_type($entry){
 		$ext = pathinfo($entry, PATHINFO_EXTENSION);
 		if ($ext && isset($this->extensions[$ext]))
 			return $this->extensions[$ext];
@@ -138,7 +138,7 @@ class CommandFileSystem implements iFileSystem{
 			$this->exec("cp -rf $source $target");
 	}
 
-	private function dir($dir, $nested){
+    protected function dir($dir, $nested){
 		$dir = $this->check_path($dir, true);
 		$this->log("List $dir");
 
