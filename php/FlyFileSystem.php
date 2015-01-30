@@ -219,4 +219,20 @@ class LocalFlyFileSystem extends FlyFileSystem{
             }
         }
     }
+
+    public function upload($path, $name, $temp){
+        $full_path = $path.$this->sep.$name;
+
+        $stream = fopen($temp, 'r+');
+        $this->aFilesystem->writeStream($full_path, $stream);
+        fclose($stream);
+
+        return array(
+            "folder" => $path,
+            "file"   => basename($full_path),
+            "id"     => $full_path,
+            "type"   => $this->get_type($name),
+            "status" => "server"
+        );
+    }
 }
