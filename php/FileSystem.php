@@ -25,8 +25,8 @@ interface iFileInfo{
 
 
 class RealFileInfo implements iFileInfo{
-	private $content;
-	private $name;
+	protected $content;
+    protected $name;
 
 	function __construct($path){
 		$this->content = file_get_contents($path);

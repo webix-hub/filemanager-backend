@@ -20,6 +20,20 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local as Adapter;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
 
+class FlyFileInfo extends RealFileInfo{
+    protected $aFilesystem;
+
+    function __construct($path, Filesystem $aFilesystem){
+        $this->aFilesystem = $aFilesystem;
+
+        $file = $this->aFilesystem->getMetadata($path);
+
+        $this->content = $this->aFilesystem->read($path);
+        $this->name = basename($file['path']);
+        $this->ext = end(explode('.', $file['path']));
+        $this->myme = $this->aFilesystem->getMimetype($path);
+    }
+}
 
 class FlyFileSystem extends CommandFileSystem{
     protected $aFilesystem;
@@ -55,6 +69,10 @@ class FlyFileSystem extends CommandFileSystem{
         usort($data, array($this, "sort"));
 
         return $data;
+    }
+
+    public function download($file){
+        return new FlyFileInfo($file, $this->aFilesystem);
     }
 }
 
