@@ -3,6 +3,7 @@ require_once("FileSystem.php");
 
 class CommandFileSystem implements iFileSystem{
 	public  $debug = false;
+	public  $test  = false;
 	public $batchSeparator = ",";
 	public $extensions = array(
 		"docx" 	=> "doc",
@@ -87,14 +88,16 @@ class CommandFileSystem implements iFileSystem{
 	}
 
 	private function exec($command){
-		if ($this->debug)
-			echo $command."\n";
-		else
+		if ($this->debug || $this->test)
+			$this->log($command);
+		if (!$this->test)
 			exec($command);
 	}
 	private function log($message){
 		if ($this->debug)
 			echo $message."\n";
+		else if ($this->test)
+			echo str_replace("\\","/",str_replace($this->top, "{!}/", $message))."\n";
 	}
 
     protected function unlink($path){

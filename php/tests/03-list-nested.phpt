@@ -6,7 +6,7 @@ Basic operations
 if (!function_exists("listlog")){
 	function listlog($data, $level){
 		foreach ($data as $key => $value){
-			echo $level.$value["value"].", ".$value["type"].", ".$value["size"].", ".$value["id"]."\n";
+			echo $level.$value["value"].", ".$value["type"].", ".$value["size"].", ".$value["id"]."/n";
 			if (isset($value["data"]))
 				listlog($value["data"], $level."- ");
 		}
@@ -17,22 +17,22 @@ include_once dirname(__FILE__) . "/../CommandFileSystem.php";
 $sandbox = realpath(__DIR__."/sandbox");
 
 $api = new CommandFileSystem($sandbox);
-$api->debug = true;
+$api->test = true;
 
 $data = $api->ls("/", true);
 listlog($data,"");
 
 ?>
 --EXPECTF--
-List C:\http\php-files-api\tests\sandbox\
-List C:\http\php-files-api\tests\sandbox\sub1\
-List C:\http\php-files-api\tests\sandbox\sub1\sub2\
+List {!}/
+List {!}/sub1/
+List {!}/sub1/sub2/
 sub1, folder, 0, sub1
 - sub2, folder, 0, sub1/sub2
 - - LICENSE, , 1067, sub1/sub2/LICENSE
 - - README.md, text, 28368, sub1/sub2/README.md
 - - zalgo.js, code, 53, sub1/sub2/zalgo.js
-- Makefile, , 562, sub1/Makefile
+- Makefile, , 532, sub1/Makefile
 D230604.txt, text, 6, D230604.txt
 D231019.txt, text, 6, D231019.txt
 D231440.txt, text, 6, D231440.txt

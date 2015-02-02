@@ -7,7 +7,7 @@ include_once dirname(__FILE__) . "/../CommandFileSystem.php";
 $sandbox = realpath(__DIR__."/sandbox");
 
 $api = new CommandFileSystem($sandbox);
-$api->debug = true;
+$api->test = true;
 $api->ls("");
 $api->ls("sub1");
 $api->ls("sub1/sub2");
@@ -16,8 +16,8 @@ $api->ls("../");
 
 ?>
 --EXPECTF--
-List C:\http\php-files-api\tests\sandbox\
-List C:\http\php-files-api\tests\sandbox\sub1\
-List C:\http\php-files-api\tests\sandbox\sub1\sub2\
-List C:\http\php-files-api\tests\sandbox\sub1\
-List C:\http\php-files-api\tests\sandbox\
+List {!}/
+List {!}/sub1/
+List {!}/sub1/sub2/
+List {!}/sub1/
+List {!}/
