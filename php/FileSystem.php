@@ -17,12 +17,12 @@ interface iFileSystem {
 
 	public function batch($source, $operation, $target);
 }
+
 interface iFileInfo{
 	public function getSize();
 	public function getName();
 	public function getContent();
 }
-
 
 class RealFileInfo implements iFileInfo{
 	protected $content;
