@@ -6,7 +6,7 @@ Basic operations
 if (!function_exists("listlog")){
 	function listlog($data, $level){
 		foreach ($data as $key => $value){
-			echo $level.$value["value"].", ".$value["type"].", ".$value["size"].", ".$value["id"]."\n";
+			echo $level.$value["value"].", ".$value["type"].", ".$value["id"]."\n";
 			if (isset($value["data"]))
 				listlog($value["data"], $level."- ");
 		}
@@ -69,7 +69,8 @@ $config_files = array(
     'structure' => array(
         'id' => 'id',
         'value' => 'value',
-        'folder_id' => 'folder_id'
+        'folder_id' => 'folder_id',
+        'data_fields' => 'color, size'
     )
 );
 
@@ -80,27 +81,27 @@ listlog($data, "");
 ?>
 --EXPECTF--
 List {!}/sub1/sub2/
-LICENSE, , 1067, sub1/sub2/LICENSE
-README.md, text, 28368, sub1/sub2/README.md
-zalgo.js, code, 53, sub1/sub2/zalgo.js
+LICENSE, , sub1/sub2/LICENSE
+README.md, text, sub1/sub2/README.md
+zalgo.js, code, sub1/sub2/zalgo.js
 List {!}/sub1/
-sub2, folder, 0, sub1/sub2
-Makefile, , 532, sub1/Makefile
+sub2, folder, sub1/sub2
+Makefile, , sub1/Makefile
 List {!}/sub1/sub2/
-LICENSE, , 1067, sub1/sub2/LICENSE
-README.md, text, 28368, sub1/sub2/README.md
-zalgo.js, code, 53, sub1/sub2/zalgo.js
+LICENSE, , sub1/sub2/LICENSE
+README.md, text, sub1/sub2/README.md
+zalgo.js, code, sub1/sub2/zalgo.js
 List {!}/sub1/
-sub2, folder, 0, sub1/sub2
-Makefile, , 532, sub1/Makefile
+sub2, folder, sub1/sub2
+Makefile, , sub1/Makefile
 List {!}/sub1/sub2/
-LICENSE, , 1067, sub1/sub2\LICENSE
-README.md, text, 28368, sub1/sub2\README.md
-zalgo.js, code, 53, sub1/sub2\zalgo.js
+LICENSE, , sub1/sub2\LICENSE
+README.md, text, sub1/sub2\README.md
+zalgo.js, code, sub1/sub2\zalgo.js
 List {!}/sub1/
-sub2, folder, 0, sub1\sub2
-Makefile, , 532, sub1\Makefile
+sub2, folder, sub1\sub2
+Makefile, , sub1\Makefile
 List from 1
-st, folder, 0, 3
-st2, folder, 0, 2
-text.txt, text, 0, 1
+st, folder, 3
+st2, folder, 2
+text.txt, text, 1

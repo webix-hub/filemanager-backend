@@ -6,7 +6,7 @@ Basic operations
 if (!function_exists("listlog")){
 	function listlog($data, $level){
 		foreach ($data as $key => $value){
-			echo $level.$value["value"].", ".$value["type"].", ".$value["size"].", ".$value["id"]."/n";
+			echo $level.$value["value"].", ".$value["type"].", ".$value["id"]."\n";
 			if (isset($value["data"]))
 				listlog($value["data"], $level."- ");
 		}
@@ -60,7 +60,8 @@ $config_files = array(
     'structure' => array(
         'id' => 'id',
         'value' => 'value',
-        'folder_id' => 'folder_id'
+        'folder_id' => 'folder_id',
+        'data_fields' => 'color, size'
     )
 );
 
@@ -73,60 +74,60 @@ listlog($data,"");
 List {!}/
 List {!}/sub1/
 List {!}/sub1/sub2/
-sub1, folder, 0, sub1
-- sub2, folder, 0, sub1/sub2
-- - LICENSE, , 1067, sub1/sub2/LICENSE
-- - README.md, text, 28368, sub1/sub2/README.md
-- - zalgo.js, code, 53, sub1/sub2/zalgo.js
-- Makefile, , 532, sub1/Makefile
-D230604.txt, text, 6, D230604.txt
-D231019.txt, text, 6, D231019.txt
-D231440.txt, text, 6, D231440.txt
-D234028.txt, text, 6, D234028.txt
-D236850.txt, text, 6, D236850.txt
-D242865.txt, text, 6, D242865.txt
-D260541.txt, text, 6, D260541.txt
-E223016.txt, text, 6, E223016.txt
+sub1, folder, sub1
+- sub2, folder, sub1/sub2
+- - LICENSE, , sub1/sub2/LICENSE
+- - README.md, text, sub1/sub2/README.md
+- - zalgo.js, code, sub1/sub2/zalgo.js
+- Makefile, , sub1/Makefile
+D230604.txt, text, D230604.txt
+D231019.txt, text, D231019.txt
+D231440.txt, text, D231440.txt
+D234028.txt, text, D234028.txt
+D236850.txt, text, D236850.txt
+D242865.txt, text, D242865.txt
+D260541.txt, text, D260541.txt
+E223016.txt, text, E223016.txt
 List {!}/
 List {!}/sub1/
 List {!}/sub1/sub2/
-sub1, folder, 0, sub1
-- sub2, folder, 0, sub1/sub2
-- - LICENSE, , 1067, sub1/sub2/LICENSE
-- - README.md, text, 28368, sub1/sub2/README.md
-- - zalgo.js, code, 53, sub1/sub2/zalgo.js
-- Makefile, , 532, sub1/Makefile
-D230604.txt, text, 6, D230604.txt
-D231019.txt, text, 6, D231019.txt
-D231440.txt, text, 6, D231440.txt
-D234028.txt, text, 6, D234028.txt
-D236850.txt, text, 6, D236850.txt
-D242865.txt, text, 6, D242865.txt
-D260541.txt, text, 6, D260541.txt
-E223016.txt, text, 6, E223016.txt
+sub1, folder, sub1
+- sub2, folder, sub1/sub2
+- - LICENSE, , sub1/sub2/LICENSE
+- - README.md, text, sub1/sub2/README.md
+- - zalgo.js, code, sub1/sub2/zalgo.js
+- Makefile, , sub1/Makefile
+D230604.txt, text, D230604.txt
+D231019.txt, text, D231019.txt
+D231440.txt, text, D231440.txt
+D234028.txt, text, D234028.txt
+D236850.txt, text, D236850.txt
+D242865.txt, text, D242865.txt
+D260541.txt, text, D260541.txt
+E223016.txt, text, E223016.txt
 List {!}/
 List {!}/sub1/
 List {!}/sub1/sub2/
-sub1, folder, 0, sub1
-- sub2, folder, 0, sub1\sub2
-- - LICENSE, , 1067, sub1\sub2\LICENSE
-- - README.md, text, 28368, sub1\sub2\README.md
-- - zalgo.js, code, 53, sub1\sub2\zalgo.js
-- Makefile, , 532, sub1\Makefile
-D230604.txt, text, 6, D230604.txt
-D231019.txt, text, 6, D231019.txt
-D231440.txt, text, 6, D231440.txt
-D234028.txt, text, 6, D234028.txt
-D236850.txt, text, 6, D236850.txt
-D242865.txt, text, 6, D242865.txt
-D260541.txt, text, 6, D260541.txt
-E223016.txt, text, 6, E223016.txt
+sub1, folder, sub1
+- sub2, folder, sub1\sub2
+- - LICENSE, , sub1\sub2\LICENSE
+- - README.md, text, sub1\sub2\README.md
+- - zalgo.js, code, sub1\sub2\zalgo.js
+- Makefile, , sub1\Makefile
+D230604.txt, text, D230604.txt
+D231019.txt, text, D231019.txt
+D231440.txt, text, D231440.txt
+D234028.txt, text, D234028.txt
+D236850.txt, text, D236850.txt
+D242865.txt, text, D242865.txt
+D260541.txt, text, D260541.txt
+E223016.txt, text, E223016.txt
 List from 1
 List from 2
 List from 3
 List from 4
-st, folder, 0, 3
-- nono, folder, 0, 4
-- - br.json, code, 0, 2
-st2, folder, 0, 2
-text.txt, text, 0, 1
+st, folder, 3
+- nono, folder, 4
+- - br.json, code, 2
+st2, folder, 2
+text.txt, text, 1

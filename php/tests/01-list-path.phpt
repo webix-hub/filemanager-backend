@@ -70,7 +70,8 @@ $config_files = array(
     'structure' => array(
         'id' => 'id',
         'value' => 'value',
-        'folder_id' => 'folder_id'
+        'folder_id' => 'folder_id',
+        'data_fields' => 'color, size'
     )
 );
 

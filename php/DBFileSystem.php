@@ -17,6 +17,7 @@ interface iTableStructure{
     public function getFolderId();
     public function getTableName();
     public function getType();
+    public function getDataFields();
 }
 
 class RealTableStructure implements iTableStructure{
@@ -25,6 +26,7 @@ class RealTableStructure implements iTableStructure{
     protected $folderId;
     protected $tableName;
     protected $type;
+    protected $data_fields = array();
 
     function __construct($config){
         $this->id = isset($config['structure']['id']) ? $config['structure']['id'] : 'id';
@@ -32,6 +34,10 @@ class RealTableStructure implements iTableStructure{
         $this->folderId = isset($config['structure']['folder_id']) ? $config['structure']['folder_id'] : 'folder_id';
         $this->tableName = $config['table_name'];
         $this->type = $config['type'];
+
+        if(isset($config['structure']['data_fields'])){
+            $this->data_fields = is_array($config['structure']['data_fields']) ? $config['structure']['data_fields'] : explode(',', preg_replace("/\s/", "", $config['structure']['data_fields']));
+        }
     }
 
     public function getId(){
@@ -48,6 +54,9 @@ class RealTableStructure implements iTableStructure{
     }
     public function getType(){
         return $this->type;
+    }
+    public function getDataFields(){
+        return $this->data_fields;
     }
 }
 
@@ -136,10 +145,12 @@ class DBFileSystem implements iDBFileSystem{
             $temp = array(
                 "id" => $row[$this->folders->getId()],
                 "value" => $row[$this->folders->getValue()],
-                "type" => "folder",
-                "size" => 0,
-                "date" => 0
+                "type" => "folder"
             );
+
+            foreach($this->folders->getDataFields() as $field) {
+                $temp[$field] = $row[$field];
+            }
 
             if ($nested){
                 $temp["data"] = $this->dir($temp["id"], $nested);
@@ -152,10 +163,12 @@ class DBFileSystem implements iDBFileSystem{
             $temp = array(
                 "id" => $row[$this->files->getId()],
                 "value" => $row[$this->files->getValue()],
-                "type" => $this->get_type($row[$this->files->getValue()]),
-                "size" => 0,
-                "date" => 0
+                "type" => $this->get_type($row[$this->files->getValue()])
             );
+
+            foreach($this->files->getDataFields() as $field) {
+                $temp[$field] = $row[$field];
+            }
 
             $data[] = $temp;
         }
@@ -178,8 +191,6 @@ class DBFileSystem implements iDBFileSystem{
                 array(
                     "value" => $root_folder[$this->folders->getValue()],
                     "type" => "folder",
-                    "size" => 0,
-                    "date" => 0,
                     "id" => $this->vrootId,
                     "data" => &$data,
                     "open" => true
@@ -253,6 +264,23 @@ class DBFileSystem implements iDBFileSystem{
         }
 
         if (!$this->test){
+            if($table->getType() == 'folders'){
+                $folders = $this->db->prepare("SELECT * FROM ".$this->folders->getTableName()." WHERE ".$this->folders->getFolderId()." = :folder_id");
+                $folders->bindParam(':folder_id', $id);
+                $folders->execute();
+
+                $files = $this->db->prepare("SELECT * FROM ".$this->files->getTableName()." WHERE ".$this->files->getFolderId()." = :folder_id");
+                $files->bindParam(':folder_id', $id);
+                $files->execute();
+
+                foreach($folders as $row) {
+                    $this->unlink($row[$this->folders->getId()], $this->folders);
+                }
+
+                foreach($files as $row) {
+                    $this->unlink($row[$this->files->getId()], $this->files);
+                }
+            }
             $sql = "DELETE FROM ".$table->getTableName()." WHERE ".$table->getId()." = :id";
 
             $stmt = $this->db->prepare($sql);
@@ -345,4 +373,3 @@ class DBFileSystem implements iDBFileSystem{
         }
     }
 }
-
