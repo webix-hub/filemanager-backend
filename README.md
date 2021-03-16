@@ -1,5 +1,13 @@
-Backend Code for Webix Filemanager
+Backend Code for Webix Filemanager (version 7.1 and below)
 ==================================
+
+
+Note
+----------
+
+This example is implemented for the old version of the File Manager that is no longer maintained.
+
+Examples of backend for the current version of the File Manager (7.2 and above) are available on [Golang](https://github.com/webix-hub/filemanager-go) and [NodeJS](https://github.com/webix-hub/filemanager-node).
 
 http://webix.com/filemanager
 
